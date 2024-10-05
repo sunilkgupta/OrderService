@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using Order.Business.Implementation;
+using Order.Business.Interfaces;
+using Order.DataContext;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<OrderService.Data.OrderAPIContext>(options =>
+builder.Services.AddDbContext<OrderAPIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OrderConnectionString") ?? throw new InvalidOperationException("Connection string 'OrderConnectionString' not found.")));
 builder.Services.AddApplicationInsightsTelemetry();
-
+builder.Services.AddScoped<IOrderBusiness, OrderBusiness>();
 // Add services to the container.
 
 builder.Services.AddControllers();

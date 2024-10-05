@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace OrderService.Data
+namespace Order.DataContext
 {
     public class OrderAPIContext : DbContext
     {
@@ -9,6 +9,6 @@ namespace OrderService.Data
         {
         }
 
-        public DbSet<Order.Common.Entities.Order> Order { get; set; } = default!;
+        public DbSet<Common.Entities.Order> Order { get; set; } = default!;
     }
 }

@@ -1,10 +1,10 @@
 using AutoFixture;
-using Microsoft.EntityFrameworkCore;
+using AutoFixture.AutoMoq;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Order.API.Controllers;
-using OrderService.Data;
+using Order.Business.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,90 +14,127 @@ namespace Order.UnitTest
     [TestClass]
     public class OrderControllerUnitTest
     {
-        private readonly Mock<ILogger<OrderController>> _logger;
-        private readonly Mock<OrderAPIContext> _context;
-        private readonly IFixture _fixture;
-        public OrderControllerUnitTest(IFixture fixture)
+        private Mock<ILogger<OrderController>> _logger;
+        private Mock<IOrderBusiness> mockOrderBusiness;
+        private Fixture _fixture;
+
+        [TestInitialize]
+        public void OrderControllerUnitTestTestInitialize()
         {
-            _fixture = fixture;
             _logger = new Mock<ILogger<OrderController>>();
-            _context = new Mock<OrderAPIContext>();
+            mockOrderBusiness = new Mock<IOrderBusiness>();
+            _fixture = new Fixture();
+            _fixture.Customize(new AutoMoqCustomization());
 
         }
 
         [TestMethod]
-        [DataRow("18B3ADB0-545E-4351-AA70-3B83710FB699")]
-        public async Task OrderController_Get_By_Id_When_Order_Is_Null(Guid id)
+        public async Task OrderController_Get_All_Orders()
         {
             //Arrange
-            var orderController = new OrderController(_logger.Object, _context.Object);
-            DbSet<Common.Entities.Order> listOrders = null;
-
-            _context.Setup(c => c.Order).Returns(listOrders);
-
-            //orderController.Setup(c => c.Get(It.IsAny<Guid>())).Returns(It.IsAny<Task<List<API.Models.Order>>>);
+            var orderResult = _fixture.Create<Task<IEnumerable<Common.Entities.Order>>>();
+            mockOrderBusiness.Setup(c => c.GetOrders()).Returns(orderResult);
 
             //Act
-            var result = await orderController.Get(id);
+            var orderController = new OrderController(_logger.Object, mockOrderBusiness.Object);
+            var result = await orderController.Get();
 
             //Assert
-            Assert.IsNull(listOrders);
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
-        [DataRow("18B3ADB0-545E-4351-AA70-3B83710FB699")]
-        public async Task OrderController_Get_By_Id_When_Order_Is_Not_Null(Guid id)
-        {
-            //Arrange
-            var orderController = new OrderController(_logger.Object, _context.Object);
-            var listOrders = _fixture.Create<DbSet<Common.Entities.Order>>();
-
-            _context.Setup(c => c.Order).Returns(listOrders);
-
-            //orderController.Setup(c => c.Get(It.IsAny<Guid>())).Returns(It.IsAny<Task<List<API.Models.Order>>>);
-
-            //Act
-            var result = await orderController.Get(id);
-
-            //Assert
-            Assert.IsNotNull(listOrders);
             Assert.IsNotNull(result);
+            Assert.IsNotNull(orderResult);
         }
 
         [TestMethod]
-        [DataRow("18B3ADB0-545E-4351-AA70-3B83710FB699")]
-        public async Task OrderController_Get_By_Id_When_Order_Is_Not_Null_But_Output_Is_Null(Guid id)
+        public async Task OrderController_Get_All_Orders_Null()
         {
             //Arrange
-            var orderController = new OrderController(_logger.Object, _context.Object);
-            var listOrders = _fixture.Create<DbSet<Common.Entities.Order>>();
-
-            _context.Setup(c => c.Order).Returns(listOrders);
-
-            //orderController.Setup(c => c.Get(It.IsAny<Guid>())).Returns(It.IsAny<Task<List<API.Models.Order>>>);
+            var orderResult = _fixture.Create<Task<IEnumerable<Common.Entities.Order>>>();
+            mockOrderBusiness.Setup(c => c.GetOrders()).Returns(orderResult);
+            orderResult = null;
 
             //Act
-            var result = await orderController.Get(id);
+            var orderController = new OrderController(_logger.Object, mockOrderBusiness.Object);
+            var result = await orderController.Get();
             result = null;
 
             //Assert
-            Assert.IsNotNull(listOrders);
             Assert.IsNull(result);
+            Assert.IsNull(orderResult);
         }
 
         [TestMethod]
-        [DataRow("18B3ADB0-545E-4351-AA70-3B83710FB699")]
-        public void OrderController_Get_When_Throw_Exception(Guid id)
+        public async Task OrderController_Get_Order_By_Id()
         {
             //Arrange
-            var inventoryController = new OrderController(_logger.Object, _context.Object);
-            var getException = _fixture.Create<Exception>();
+            var orderResult = _fixture.Create<Task<Common.Entities.Order>>();
+            mockOrderBusiness.Setup(c => c.GetOrdersById(It.IsAny<Guid>())).Returns(orderResult);
+            //orderResult = null;
 
             //Act
-            var result = Assert.ThrowsException<Exception>(() => inventoryController.Get(id));
-            Assert.AreEqual(getException, result);
+            var orderController = new OrderController(_logger.Object, mockOrderBusiness.Object);
+            var id = _fixture.Create<Guid>();
+            var result = await orderController.Get(id);
 
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(orderResult);
         }
+
+        [TestMethod]
+        public async Task OrderController_Create_Order()
+        {
+            //Arrange
+            var orderResult = _fixture.Create<Task<Common.Entities.Order>>();
+            orderResult.Result.OrderId = Guid.Empty;
+            mockOrderBusiness.Setup(c => c.CreateOrder(It.IsAny<Common.Entities.Order>())).Returns(orderResult);
+
+            //Act
+            var orderController = new OrderController(_logger.Object, mockOrderBusiness.Object);
+            var order = _fixture.Create<Common.Entities.Order>();
+            var result = await orderController.Post(order);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(orderResult);
+        }
+
+        [TestMethod]
+        public async Task OrderController_Update_Order()
+        {
+            //Arrange
+            var orderResult = _fixture.Create<Task<Common.Entities.Order>>();
+            mockOrderBusiness.Setup(c => c.UpdateOrder(It.IsAny<Guid>(),It.IsAny<Common.Entities.Order>())).Returns(orderResult);
+
+            //Act
+            var orderController = new OrderController(_logger.Object, mockOrderBusiness.Object);
+            var order = _fixture.Create<Common.Entities.Order>();
+            var id = _fixture.Create<Guid>();
+
+            var result = await orderController.Put(id,order);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(orderResult);
+        }
+
+        [TestMethod]
+        public async Task OrderController_Delete_Order()
+        {
+            //Arrange
+            var orderResult = _fixture.Create<Task<bool>>();
+            mockOrderBusiness.Setup(c => c.DeleteOrder(It.IsAny<Guid>())).Returns(orderResult);
+
+            //Act
+            var orderController = new OrderController(_logger.Object, mockOrderBusiness.Object);
+            var id = _fixture.Create<Guid>();
+
+            var result = await orderController.Delete(id);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(orderResult);
+        }
+
+        
     }
 }
