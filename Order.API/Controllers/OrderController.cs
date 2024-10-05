@@ -26,7 +26,7 @@ namespace Order.API.Controllers
         /// <returns></returns>
         // GET: api/Order
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Models.Order>>> Get()
+        public async Task<ActionResult<IEnumerable<Common.Entities.Order>>> Get()
         {
             try
             {
@@ -51,7 +51,7 @@ namespace Order.API.Controllers
         /// <returns></returns>
         // GET: api/Order/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Models.Order>> Get(Guid id)
+        public async Task<ActionResult<Common.Entities.Order>> Get(Guid id)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Order.API.Controllers
         // PUT: api/Order/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(Guid id, Models.Order order)
+        public async Task<IActionResult> Put(Guid id, Common.Entities.Order order)
         {
             _logger.LogInformation("Order updating: Id is {0}", id);
             try
@@ -126,7 +126,7 @@ namespace Order.API.Controllers
         // POST: api/Order
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Models.Order>> Post(Models.Order order)
+        public async Task<ActionResult<Common.Entities.Order>> Post(Common.Entities.Order order)
         {
             try
             {

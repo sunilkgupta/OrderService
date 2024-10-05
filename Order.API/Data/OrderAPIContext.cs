@@ -9,6 +9,6 @@ namespace OrderService.Data
         {
         }
 
-        public DbSet<Order.API.Models.Order> Order { get; set; } = default!;
+        public DbSet<Order.Common.Entities.Order> Order { get; set; } = default!;
     }
 }

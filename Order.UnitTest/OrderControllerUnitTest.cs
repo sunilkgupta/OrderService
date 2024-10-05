@@ -31,7 +31,7 @@ namespace Order.UnitTest
         {
             //Arrange
             var orderController = new OrderController(_logger.Object, _context.Object);
-            DbSet<API.Models.Order> listOrders = null;
+            DbSet<Common.Entities.Order> listOrders = null;
 
             _context.Setup(c => c.Order).Returns(listOrders);
 
@@ -51,7 +51,7 @@ namespace Order.UnitTest
         {
             //Arrange
             var orderController = new OrderController(_logger.Object, _context.Object);
-            var listOrders = _fixture.Create<DbSet<API.Models.Order>>();
+            var listOrders = _fixture.Create<DbSet<Common.Entities.Order>>();
 
             _context.Setup(c => c.Order).Returns(listOrders);
 
@@ -71,7 +71,7 @@ namespace Order.UnitTest
         {
             //Arrange
             var orderController = new OrderController(_logger.Object, _context.Object);
-            var listOrders = _fixture.Create<DbSet<API.Models.Order>>();
+            var listOrders = _fixture.Create<DbSet<Common.Entities.Order>>();
 
             _context.Setup(c => c.Order).Returns(listOrders);
 
