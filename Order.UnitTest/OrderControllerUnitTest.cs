@@ -133,8 +133,6 @@ namespace Order.UnitTest
             //Assert
             Assert.IsNotNull(result);
             Assert.IsNotNull(orderResult);
-        }
-
-        
+        }        
     }
 }
