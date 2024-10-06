@@ -17,7 +17,7 @@ An OrderService project which defines best pratices of using microservices appro
 
 ## About The Project
 
-Inventory service is capable of CRUD operations on entity, only based on Inventory data for ordering.
+Order service is capable of CRUD operations on entity, only based on Inventory data for ordering.
 
 It uses Azure Function to reduce the inventory quantity whenever any new order gets placed.
 
